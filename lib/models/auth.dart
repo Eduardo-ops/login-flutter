@@ -3,6 +3,7 @@ import 'dart:html';
 
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:login_app/exceptions/auth_exception.dart';
 
 class Auth with ChangeNotifier {
   static const _url =
@@ -18,6 +19,14 @@ class Auth with ChangeNotifier {
       body: jsonEncode(
           {'email': email, 'password': password, 'returnSecureToken': true}),
     );
+
+    final body = jsonDecode(response.body);
+
+    if (body['error'] != null) {
+      throw AuthException(body['error']['message']);
+    }
+
+    print(body);
   }
 
   // Método para se inscrever
