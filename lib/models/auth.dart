@@ -1,13 +1,36 @@
 import 'dart:convert';
-import 'dart:html';
 
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:login_app/exceptions/auth_exception.dart';
 
 class Auth with ChangeNotifier {
-  static const _url =
-      'https://identitytoolkit.googleapis.com/v1/accounts:signUp?key=';
+  // Variáveis para gerenciamento de token
+  String? _token;
+  String? _email;
+  String? _uid;
+  DateTime? _expiryDate;
+
+  // Método para verificar se o usuário está autenticado/logado
+  bool get isAuth {
+    final isValid = _expiryDate?.isAfter(DateTime.now()) ?? false;
+    return _token != null && isValid;
+  }
+
+  // Se estiver autenticado, será retornado um token
+  String? get token {
+    return isAuth ? _token : null;
+  }
+
+// Se estiver autenticado, será retornado um email
+  String? get email {
+    return isAuth ? _email : null;
+  }
+
+// Se estiver autenticado, será retornado um uid
+  String? get id {
+    return isAuth ? _uid : null;
+  }
 
   // Método que realiza autenticação
   Future<void> _authentication(
@@ -22,19 +45,31 @@ class Auth with ChangeNotifier {
 
     final body = jsonDecode(response.body);
 
+    // Tratamento de erro de autenticação
     if (body['error'] != null) {
       throw AuthException(body['error']['message']);
+    }
+    // Gerenciamento de token
+    else {
+      _token = body['idToken'];
+      _email = body['email'];
+      _uid = body['localId'];
+
+      _expiryDate = DateTime.now().add(
+        Duration(seconds: int.parse(body['expiresIn'])),
+      );
+      notifyListeners();
     }
 
     print(body);
   }
 
-  // Método para se inscrever
+  // Método para se inscrever com autenticação
   Future<void> signup(String email, String password) async {
     _authentication(email, password, 'signUp');
   }
 
-  // Método para realizar login
+  // Método para realizar login com autenticação
   Future<void> login(String email, String password) async {
     _authentication(email, password, 'signInWithPassword');
   }

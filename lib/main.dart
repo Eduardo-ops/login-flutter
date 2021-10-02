@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:login_app/models/auth.dart';
 import 'package:login_app/routes/app_routes.dart';
-import 'package:login_app/views/auth_page.dart';
-import 'package:login_app/views/home.dart';
+import 'package:login_app/views/auth_of_home_page.dart';
 import 'package:provider/provider.dart';
 
 void main() {
@@ -22,8 +21,7 @@ class MyApp extends StatelessWidget {
         debugShowCheckedModeBanner: false,
         title: 'Login',
         routes: {
-          AppRoutes.HOME: (_) => Home(),
-          AppRoutes.AUTH: (_) => AuthPage(),
+          AppRoutes.AUTH_OF_HOME: (_) => AuthOrHomePage(),
         },
       ),
     );
